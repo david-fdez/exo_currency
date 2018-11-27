@@ -1,14 +1,28 @@
 from django.db import models
+import requests
+from datetime import datetime, timedelta, date
 
-# Create your models here.
+# TODO these date (accessKey, currencies) should not be hardcoded here
+accessKey = "71536a9dda6d9e466c6b74066f341948"
+allCurrencies = "EUR,CHF,USD,GBP"
 
-class CurrencyRates(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    title = models.CharField(max_length=100, blank=True, default='')
-    code = models.TextField()
-    linenos = models.BooleanField(default=False)
-    """ language = models.CharField(choices=LANGUAGE_CHOICES, default='python', max_length=100)
-    style = models.CharField(choices=STYLE_CHOICES, default='friendly', max_length=100) """
+class FixerCurrencyRates():
+    def __init__(self, dateFrom, dateTo):
+        self.dateFrom = dateFrom
+        self.dateTo = dateTo
+        self.dateToCurrencyRates = dict()
 
-    class Meta:
-        ordering = ('created',)
+    def listCurrencyRates(self):
+        dateFromCopy = self.dateFrom
+        while dateFromCopy <= self.dateTo :
+            url = "http://data.fixer.io/api/{0}?access_key={1}&symbols={2}".format(dateFromCopy, accessKey, allCurrencies)
+            response = requests.get(url)
+            if response.status_code == 200:
+                responseContent = response.json()
+                self.dateToCurrencyRates[dateFromCopy.strftime("%Y-%m-%d")] = responseContent.get('rates')
+            else: 
+                raise "Error retrieving data from fixer.io"
+            dateFromCopy = dateFromCopy + timedelta(1)
+            
+        return { 'dateFrom': self.dateFrom, 'dateTo': self.dateTo, 'dateToCurrencyRates': self.dateToCurrencyRates }
+
