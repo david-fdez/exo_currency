@@ -4,8 +4,7 @@ from datetime import datetime, timedelta, date
 
 from django.conf import settings
 
-# TODO these data (accessKey, currencies) should not be hardcoded here
-accessKey = "71536a9dda6d9e466c6b74066f341948"
+accessKey = settings.FIXERIO_ACCESS_KEY
 allCurrencies = ["EUR", "CHF", "USD", "GBP"]
 
 class CurrencyRatesFactory():
