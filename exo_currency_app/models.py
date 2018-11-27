@@ -62,3 +62,13 @@ class FixerCurrencyExchange():
             return {'result': round(result,2), 'originCurrency': self.originCurrency, 'targetCurrency': self.targetCurrency, 'amount': self.amount }    
         else:
             raise "Error retrieving data from fixer.io"    
+
+class MockCurrencyExchange():
+    def __init__(self, originCurrency, targetCurrency, amount):
+        self.originCurrency = originCurrency
+        self.targetCurrency = targetCurrency
+        self.amount = amount
+
+    def calculate(self):
+        result = round(random.uniform(0, 150), 2)
+        return {'result': round(result,2), 'originCurrency': self.originCurrency, 'targetCurrency': self.targetCurrency, 'amount': self.amount }    

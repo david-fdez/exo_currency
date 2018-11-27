@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, date
 
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from exo_currency_app.models import FixerCurrencyRates, MockCurrencyRates, FixerCurrencyExchange
+from exo_currency_app.models import FixerCurrencyRates, MockCurrencyRates, FixerCurrencyExchange, MockCurrencyExchange
 
 import requests
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
@@ -48,7 +48,7 @@ def getCurrencyExchange(request):
 
     try:
         # TODO should use "driver" pattern (polymorphism)
-        currencyExchangeModel = FixerCurrencyExchange
+        currencyExchangeModel =  FixerCurrencyExchange # MockCurrencyExchange
         result = currencyExchangeModel(originCurrency, targetCurrency, amount).calculate()        
     except:
         return HttpResponseServerError("Internal error")
