@@ -83,7 +83,6 @@ class FixerTimeWeightedRateOfReturn():
         self.dateInvested = dateInvested
 
     def calculate(self):
-
         investedDateCurrencyRates = FixerCurrencyRates(self.dateInvested, self.dateInvested).listCurrencyRates()
         originCurrencyInitialExchangeRate = float(investedDateCurrencyRates.get('dateToCurrencyRates').get(str(self.dateInvested)).get(self.originCurrency))
         targetCurrencyInitialExchangeRate = float(investedDateCurrencyRates.get('dateToCurrencyRates').get(str(self.dateInvested)).get(self.targetCurrency))
@@ -94,4 +93,18 @@ class FixerTimeWeightedRateOfReturn():
         # if no cash flow since investment: TimeWeightedRateOfReturn = RateOfReturn
         percentageRateOfReturn = (currentValueInSourceCurrency - self.amount) * 100 / self.amount
         return {'result': round(percentageRateOfReturn,2), 'originCurrency': self.originCurrency, 'targetCurrency': self.targetCurrency, 'amount': self.amount, 'dateInvested': self.dateInvested }
+
+
+class MockTimeWeightedRateOfReturn():
+    def __init__(self, originCurrency, targetCurrency, amount, dateInvested):
+        self.originCurrency = originCurrency
+        self.targetCurrency = targetCurrency
+        self.amount = amount
+        self.dateInvested = dateInvested
+
+    def calculate(self):
+        result = round(random.uniform(0, 150), 2) * self.amount
+        return {'result': result, 'originCurrency': self.originCurrency, 'targetCurrency': self.targetCurrency, 'amount': self.amount, 'dateInvested': self.dateInvested }
+
+
     

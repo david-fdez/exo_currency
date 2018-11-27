@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, date
 
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from exo_currency_app.models import FixerCurrencyRates, MockCurrencyRates, FixerCurrencyExchange, MockCurrencyExchange, FixerTimeWeightedRateOfReturn
+from exo_currency_app.models import FixerCurrencyRates, MockCurrencyRates, FixerCurrencyExchange, MockCurrencyExchange, FixerTimeWeightedRateOfReturn, MockTimeWeightedRateOfReturn
 
 import requests
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
@@ -76,8 +76,8 @@ def getTimeWeightedRateOfReturn(request):
         return HttpResponseBadRequest("amount must be a float")
 
     try:
-    # TODO should use "driver" pattern (polymorphism)
-        timeWeightedRateOfReturnModel =  FixerTimeWeightedRateOfReturn
+        # TODO should use "driver" pattern (polymorphism)
+        timeWeightedRateOfReturnModel =  FixerTimeWeightedRateOfReturn # MockTimeWeightedRateOfReturn
         result = timeWeightedRateOfReturnModel(originCurrency, targetCurrency, initialAmount, dateInvested).calculate()        
     except:
         return HttpResponseServerError("Internal error")
