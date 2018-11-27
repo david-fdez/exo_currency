@@ -1,10 +1,10 @@
 from django.db import models
-import requests
+import requests, random
 from datetime import datetime, timedelta, date
 
 # TODO these date (accessKey, currencies) should not be hardcoded here
 accessKey = "71536a9dda6d9e466c6b74066f341948"
-allCurrencies = "EUR,CHF,USD,GBP"
+allCurrencies = ["EUR", "CHF", "USD", "GBP"]
 
 class FixerCurrencyRates():
     def __init__(self, dateFrom, dateTo):
@@ -15,7 +15,7 @@ class FixerCurrencyRates():
     def listCurrencyRates(self):
         dateFromCopy = self.dateFrom
         while dateFromCopy <= self.dateTo :
-            url = "http://data.fixer.io/api/{0}?access_key={1}&symbols={2}".format(dateFromCopy, accessKey, allCurrencies)
+            url = "http://data.fixer.io/api/{0}?access_key={1}&symbols={2}".format(dateFromCopy, accessKey, ",".join(allCurrencies))
             response = requests.get(url)
             if response.status_code == 200:
                 responseContent = response.json()
@@ -26,3 +26,21 @@ class FixerCurrencyRates():
             
         return { 'dateFrom': self.dateFrom, 'dateTo': self.dateTo, 'dateToCurrencyRates': self.dateToCurrencyRates }
 
+class MockCurrencyRates():
+    def __init__(self, dateFrom, dateTo):
+        self.dateFrom = dateFrom
+        self.dateTo = dateTo
+        self.dateToCurrencyRates = dict()
+
+    def listCurrencyRates(self):
+        dateFromCopy = self.dateFrom
+        while dateFromCopy <= self.dateTo :
+            dateFromCopyString = dateFromCopy.strftime("%Y-%m-%d")
+            self.dateToCurrencyRates[dateFromCopyString] = dict()
+
+            for currency in allCurrencies:
+                self.dateToCurrencyRates[dateFromCopyString][currency] = round(random.uniform(0, 150), 2)
+
+            dateFromCopy = dateFromCopy + timedelta(1)
+            
+        return { 'dateFrom': self.dateFrom, 'dateTo': self.dateTo, 'dateToCurrencyRates': self.dateToCurrencyRates }

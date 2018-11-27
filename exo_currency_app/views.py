@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, date
 
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from exo_currency_app.models import FixerCurrencyRates
+from exo_currency_app.models import FixerCurrencyRates, MockCurrencyRates
 
 import requests
 from django.http import JsonResponse, HttpResponseBadRequest
@@ -24,7 +24,9 @@ def getCurrencyRatesHistory(request):
     if dateFrom > date.today() or dateTo > date.today():
         return HttpResponseBadRequest("dateFrom and dateTo cannot be in the future")
 
+    # TODO should use "driver" pattern (polymorphism)
     return JsonResponse(FixerCurrencyRates(dateFrom, dateTo).listCurrencyRates())
+    # return JsonResponse(MockCurrencyRates(dateFrom, dateTo).listCurrencyRates())
 
 
 def currencyExchange(request):
