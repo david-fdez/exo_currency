@@ -44,3 +44,21 @@ class MockCurrencyRates():
             dateFromCopy = dateFromCopy + timedelta(1)
             
         return { 'dateFrom': self.dateFrom, 'dateTo': self.dateTo, 'dateToCurrencyRates': self.dateToCurrencyRates }
+
+class FixerCurrencyExchange():
+    def __init__(self, originCurrency, targetCurrency, amount):
+        self.originCurrency = originCurrency
+        self.targetCurrency = targetCurrency
+        self.amount = amount
+
+    def calculate(self):
+        url = "http://data.fixer.io/api/latest?access_key={}".format(accessKey)
+        response = requests.get(url)
+        if response.status_code == 200:
+            responseContent = response.json()
+            originCurrencyEuroExchangeRate = float(responseContent.get('rates').get(self.originCurrency))
+            targetCurrencyEuroExchangeRate = float(responseContent.get('rates').get(self.targetCurrency))
+            result = self.amount * targetCurrencyEuroExchangeRate / originCurrencyEuroExchangeRate
+            return {'result': round(result,2), 'originCurrency': self.originCurrency, 'targetCurrency': self.targetCurrency, 'amount': self.amount }    
+        else:
+            raise "Error retrieving data from fixer.io"    

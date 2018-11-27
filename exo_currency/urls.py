@@ -26,7 +26,7 @@ router = routers.DefaultRouter()
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     url(r'currencyRatesHistory', views.getCurrencyRatesHistory),
-    url(r'currencyCalculations/exchange', views.currencyExchange),
+    url(r'currencyCalculations/exchange', views.getCurrencyExchange),
     url(r'currencyCalculations/twrr', views.timeWeightedRateOfReturn),
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))

@@ -4,10 +4,10 @@ from datetime import datetime, timedelta, date
 
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from exo_currency_app.models import FixerCurrencyRates, MockCurrencyRates
+from exo_currency_app.models import FixerCurrencyRates, MockCurrencyRates, FixerCurrencyExchange
 
 import requests
-from django.http import JsonResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
 
 
 def getCurrencyRatesHistory(request):
@@ -24,31 +24,35 @@ def getCurrencyRatesHistory(request):
     if dateFrom > date.today() or dateTo > date.today():
         return HttpResponseBadRequest("dateFrom and dateTo cannot be in the future")
 
-    # TODO should use "driver" pattern (polymorphism)
-    return JsonResponse(FixerCurrencyRates(dateFrom, dateTo).listCurrencyRates())
-    # return JsonResponse(MockCurrencyRates(dateFrom, dateTo).listCurrencyRates())
+    try:
+        # TODO should use "driver" pattern (polymorphism)
+        currencyRatesModel = FixerCurrencyRates # MockCurrencyRates
+        result = currencyRatesModel(dateFrom, dateTo).listCurrencyRates()
+    except:
+        return HttpResponseServerError("Internal error")
+    return JsonResponse(result)
 
 
-def currencyExchange(request):
-    # TODO this should be done following a "driver" pattern
-    # TODO verify all parameters are there and format
-    # TODO access key should not be hardcoded
-    accessKey = "71536a9dda6d9e466c6b74066f341948"
+def getCurrencyExchange(request):
     originCurrency = request.GET.get('originCurrency')
     targetCurrency = request.GET.get('targetCurrency')
     amount = request.GET.get('amount')
 
-    # url = "http://data.fixer.io/api/convert?access_key={0}&from={1}&to={2}&amount={3}".format(accessKey, originCurrency, targetCurrency, amount)
-    url = "http://data.fixer.io/api/latest?access_key={}".format(accessKey)
-    response = requests.get(url)
-    if response.status_code == 200:
-        responseContent = response.json()
-        originCurrencyEuroExchangeRate = float(responseContent.get('rates').get(originCurrency))
-        targetCurrencyEuroExchangeRate = float(responseContent.get('rates').get(targetCurrency))
-        result = float(amount) * targetCurrencyEuroExchangeRate / originCurrencyEuroExchangeRate
-        return JsonResponse({'result': round(result,2), 'originCurrency': originCurrency, 'targetCurrency': targetCurrency, 'amount': amount })
-    # TODO actually send error status blabla
-    return JsonResponse({'test':'not worked'})
+    if originCurrency is None or targetCurrency is None or amount is None:
+        return HttpResponseBadRequest("originCurrency, targetCurrency and amount are required parameters")
+
+    try:
+        amount = float(amount)
+    except ValueError:
+        return HttpResponseBadRequest("amount must be a float")
+
+    try:
+        # TODO should use "driver" pattern (polymorphism)
+        currencyExchangeModel = FixerCurrencyExchange
+        result = currencyExchangeModel(originCurrency, targetCurrency, amount).calculate()        
+    except:
+        return HttpResponseServerError("Internal error")
+    return JsonResponse(result)
 
 def timeWeightedRateOfReturn(request):
     # TODO this should be done following a "driver" pattern
