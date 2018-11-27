@@ -2,7 +2,7 @@ from django.db import models
 import requests, random
 from datetime import datetime, timedelta, date
 
-# TODO these date (accessKey, currencies) should not be hardcoded here
+# TODO these data (accessKey, currencies) should not be hardcoded here
 accessKey = "71536a9dda6d9e466c6b74066f341948"
 allCurrencies = ["EUR", "CHF", "USD", "GBP"]
 
@@ -21,6 +21,7 @@ class FixerCurrencyRates():
                 responseContent = response.json()
                 self.dateToCurrencyRates[dateFromCopy.strftime("%Y-%m-%d")] = responseContent.get('rates')
             else: 
+                print(response)
                 raise "Error retrieving data from fixer.io"
             dateFromCopy = dateFromCopy + timedelta(1)
             
@@ -61,6 +62,7 @@ class FixerCurrencyExchange():
             result = self.amount * targetCurrencyEuroExchangeRate / originCurrencyEuroExchangeRate
             return {'result': round(result,2), 'originCurrency': self.originCurrency, 'targetCurrency': self.targetCurrency, 'amount': self.amount }    
         else:
+            print(response)
             raise "Error retrieving data from fixer.io"    
 
 class MockCurrencyExchange():
@@ -72,3 +74,24 @@ class MockCurrencyExchange():
     def calculate(self):
         result = round(random.uniform(0, 150), 2)
         return {'result': round(result,2), 'originCurrency': self.originCurrency, 'targetCurrency': self.targetCurrency, 'amount': self.amount }    
+
+class FixerTimeWeightedRateOfReturn():
+    def __init__(self, originCurrency, targetCurrency, amount, dateInvested):
+        self.originCurrency = originCurrency
+        self.targetCurrency = targetCurrency
+        self.amount = amount
+        self.dateInvested = dateInvested
+
+    def calculate(self):
+
+        investedDateCurrencyRates = FixerCurrencyRates(self.dateInvested, self.dateInvested).listCurrencyRates()
+        originCurrencyInitialExchangeRate = float(investedDateCurrencyRates.get('dateToCurrencyRates').get(str(self.dateInvested)).get(self.originCurrency))
+        targetCurrencyInitialExchangeRate = float(investedDateCurrencyRates.get('dateToCurrencyRates').get(str(self.dateInvested)).get(self.targetCurrency))
+        amountInTargetCurrency = self.amount * targetCurrencyInitialExchangeRate / originCurrencyInitialExchangeRate
+
+        currentValueInSourceCurrency = FixerCurrencyExchange(originCurrency = self.targetCurrency, targetCurrency = self.originCurrency, amount = amountInTargetCurrency).calculate()['result']
+
+        # if no cash flow since investment: TimeWeightedRateOfReturn = RateOfReturn
+        percentageRateOfReturn = (currentValueInSourceCurrency - self.amount) * 100 / self.amount
+        return {'result': round(percentageRateOfReturn,2), 'originCurrency': self.originCurrency, 'targetCurrency': self.targetCurrency, 'amount': self.amount, 'dateInvested': self.dateInvested }
+    
