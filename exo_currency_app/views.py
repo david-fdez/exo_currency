@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, date
 
 from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
-from exo_currency_app.models import FixerCurrencyRates, MockCurrencyRates, FixerCurrencyExchange, MockCurrencyExchange, FixerTimeWeightedRateOfReturn, MockTimeWeightedRateOfReturn
+from exo_currency_app.models import CurrencyRatesFactory, CurrencyExchangeFactory, TimeWeightedRateOfReturnFactory
 
 import requests
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
@@ -25,9 +25,7 @@ def getCurrencyRatesHistory(request):
         return HttpResponseBadRequest("dateFrom and dateTo cannot be in the future")
 
     try:
-        # TODO should use "driver" pattern (polymorphism)
-        currencyRatesModel = FixerCurrencyRates # MockCurrencyRates
-        result = currencyRatesModel(dateFrom, dateTo).listCurrencyRates()
+        result = CurrencyRatesFactory().create(dateFrom, dateTo).listCurrencyRates()
     except:
         return HttpResponseServerError("Internal error")
     return JsonResponse(result)
@@ -47,9 +45,7 @@ def getCurrencyExchange(request):
         return HttpResponseBadRequest("amount must be a float")
 
     try:
-        # TODO should use "driver" pattern (polymorphism)
-        currencyExchangeModel =  FixerCurrencyExchange # MockCurrencyExchange
-        result = currencyExchangeModel(originCurrency, targetCurrency, amount).calculate()        
+        result = CurrencyExchangeFactory().create(originCurrency, targetCurrency, amount).calculate()        
     except:
         return HttpResponseServerError("Internal error")
     return JsonResponse(result)
@@ -76,9 +72,7 @@ def getTimeWeightedRateOfReturn(request):
         return HttpResponseBadRequest("amount must be a float")
 
     try:
-        # TODO should use "driver" pattern (polymorphism)
-        timeWeightedRateOfReturnModel =  FixerTimeWeightedRateOfReturn # MockTimeWeightedRateOfReturn
-        result = timeWeightedRateOfReturnModel(originCurrency, targetCurrency, initialAmount, dateInvested).calculate()        
+        result = TimeWeightedRateOfReturnFactory().create(originCurrency, targetCurrency, initialAmount, dateInvested).calculate()        
     except:
         return HttpResponseServerError("Internal error")
     return JsonResponse(result)

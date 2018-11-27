@@ -125,3 +125,6 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10
 }
+
+CURRENCY_PROVIDER = "FIXER" 
+# CURRENCY_PROVIDER = "MOCK" 

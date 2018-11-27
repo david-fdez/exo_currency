@@ -2,9 +2,18 @@ from django.db import models
 import requests, random
 from datetime import datetime, timedelta, date
 
+from django.conf import settings
+
 # TODO these data (accessKey, currencies) should not be hardcoded here
 accessKey = "71536a9dda6d9e466c6b74066f341948"
 allCurrencies = ["EUR", "CHF", "USD", "GBP"]
+
+class CurrencyRatesFactory():
+    def create(self, dateFrom, dateTo):
+        if settings.CURRENCY_PROVIDER == "MOCK":
+            return MockCurrencyRates(dateFrom, dateTo)
+        else:
+            return FixerCurrencyRates(dateFrom, dateTo)
 
 class FixerCurrencyRates():
     def __init__(self, dateFrom, dateTo):
@@ -46,6 +55,15 @@ class MockCurrencyRates():
             
         return { 'dateFrom': self.dateFrom, 'dateTo': self.dateTo, 'dateToCurrencyRates': self.dateToCurrencyRates }
 
+
+
+class CurrencyExchangeFactory():
+    def create(self, originCurrency, targetCurrency, amount):
+        if settings.CURRENCY_PROVIDER == "MOCK":
+            return MockCurrencyExchange(originCurrency, targetCurrency, amount) 
+        else:
+            return FixerCurrencyExchange(originCurrency, targetCurrency, amount)
+
 class FixerCurrencyExchange():
     def __init__(self, originCurrency, targetCurrency, amount):
         self.originCurrency = originCurrency
@@ -74,6 +92,15 @@ class MockCurrencyExchange():
     def calculate(self):
         result = round(random.uniform(0, 150), 2)
         return {'result': round(result,2), 'originCurrency': self.originCurrency, 'targetCurrency': self.targetCurrency, 'amount': self.amount }    
+
+
+class TimeWeightedRateOfReturnFactory():
+    def create(self, originCurrency, targetCurrency, amount, dateInvested):
+        if settings.CURRENCY_PROVIDER == "MOCK":
+            return MockTimeWeightedRateOfReturn(originCurrency, targetCurrency, amount, dateInvested) 
+        else:
+            return FixerTimeWeightedRateOfReturn(originCurrency, targetCurrency, amount, dateInvested)
+
 
 class FixerTimeWeightedRateOfReturn():
     def __init__(self, originCurrency, targetCurrency, amount, dateInvested):
