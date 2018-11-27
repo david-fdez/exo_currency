@@ -28,6 +28,7 @@ urlpatterns = [
     url(r'currencyRatesHistory', views.getCurrencyRatesHistory),
     url(r'currencyCalculations/exchange', views.getCurrencyExchange),
     url(r'currencyCalculations/twrr', views.getTimeWeightedRateOfReturn),
+    url(r'backoffice/exchangeRateEvolution', views.BackOfficeView.as_view()),
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

@@ -1,13 +1,15 @@
 from django.shortcuts import render
 from datetime import datetime, timedelta, date
 
-
-from django.contrib.auth.models import User, Group
 from rest_framework import viewsets
 from exo_currency_app.models import CurrencyRatesFactory, CurrencyExchangeFactory, TimeWeightedRateOfReturnFactory
 
 import requests
 from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServerError
+from django.views.generic import TemplateView
+from pygal.style import DarkStyle
+
+from .charts import FruitPieChart
 
 
 def getCurrencyRatesHistory(request):
@@ -76,3 +78,23 @@ def getTimeWeightedRateOfReturn(request):
     except:
         return HttpResponseServerError("Internal error")
     return JsonResponse(result)
+
+class BackOfficeView(TemplateView):
+    template_name = 'charts.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(BackOfficeView, self).get_context_data(**kwargs)
+
+        # Instantiate our chart. We'll keep the size/style/etc.
+        # config here in the view instead of `charts.py`.
+        cht_fruits = FruitPieChart(
+            height=600,
+            width=800,
+            explicit_size=True,
+            style=DarkStyle
+        )
+
+        # Call the `.generate()` method on our chart object
+        # and pass it to template context.
+        context['cht_fruits'] = cht_fruits.generate()
+        return context    
