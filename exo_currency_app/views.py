@@ -9,7 +9,7 @@ from django.http import JsonResponse, HttpResponseBadRequest, HttpResponseServer
 from django.views.generic import TemplateView
 from pygal.style import DarkStyle
 
-from .charts import FruitPieChart
+from .charts import BackOfficeCurrencyExchangeChart
 
 
 def getCurrencyRatesHistory(request):
@@ -87,7 +87,7 @@ class BackOfficeView(TemplateView):
 
         # Instantiate our chart. We'll keep the size/style/etc.
         # config here in the view instead of `charts.py`.
-        cht_fruits = FruitPieChart(
+        currencyChart = BackOfficeCurrencyExchangeChart(
             height=600,
             width=800,
             explicit_size=True,
@@ -96,5 +96,5 @@ class BackOfficeView(TemplateView):
 
         # Call the `.generate()` method on our chart object
         # and pass it to template context.
-        context['cht_fruits'] = cht_fruits.generate()
+        context['currency_chart'] = currencyChart.generate()
         return context    

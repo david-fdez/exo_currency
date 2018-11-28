@@ -131,12 +131,4 @@ class MockTimeWeightedRateOfReturn():
     def calculate(self):
         result = round(random.uniform(0, 150), 2) * self.amount
         return {'result': result, 'originCurrency': self.originCurrency, 'targetCurrency': self.targetCurrency, 'amount': self.amount, 'dateInvested': self.dateInvested }
-
-
-class Fruit(models.Model):
-    name = models.CharField(max_length=255)
-    amt = models.IntegerField()
-
-    def __str__(self):
-        return self.name
     
