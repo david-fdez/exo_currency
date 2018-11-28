@@ -85,16 +85,14 @@ class BackOfficeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(BackOfficeView, self).get_context_data(**kwargs)
 
-        # Instantiate our chart. We'll keep the size/style/etc.
-        # config here in the view instead of `charts.py`.
+        # Instantiate the chart
         currencyChart = BackOfficeCurrencyExchangeChart(
             height=600,
-            width=800,
+            width=900,
             explicit_size=True,
             style=DarkStyle
         )
 
-        # Call the `.generate()` method on our chart object
-        # and pass it to template context.
+        # Call the `.generate()` method on the chart and return it to template context.
         context['currency_chart'] = currencyChart.generate()
         return context    
