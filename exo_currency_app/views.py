@@ -52,6 +52,7 @@ def getCurrencyExchange(request):
         return HttpResponseServerError("Internal error")
     return JsonResponse(result)
 
+
 def getTimeWeightedRateOfReturn(request):
     originCurrency = request.GET.get('originCurrency')
     targetCurrency = request.GET.get('targetCurrency')

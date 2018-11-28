@@ -126,6 +126,7 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 10
 }
 
+# Application data
 CURRENCY_PROVIDER = "FIXER.IO" 
 # CURRENCY_PROVIDER = "MOCK"
  

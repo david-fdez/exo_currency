@@ -22,10 +22,13 @@ router = routers.DefaultRouter()
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
+    # exchange rates API
     url(r'currencyRatesHistory', views.getCurrencyRatesHistory),
     url(r'currencyCalculations/exchange', views.getCurrencyExchange),
     url(r'currencyCalculations/twrr', views.getTimeWeightedRateOfReturn),
+    # backoffice url
     url(r'backoffice/exchangeRateEvolution', views.BackOfficeView.as_view()),
+    # other 
     url(r'^', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]

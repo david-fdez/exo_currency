@@ -29,7 +29,6 @@ class FixerCurrencyRates():
                 responseContent = response.json()
                 self.dateToCurrencyRates[dateFromCopy.strftime("%Y-%m-%d")] = responseContent.get('rates')
             else: 
-                print(response)
                 raise "Error retrieving data from fixer.io"
             dateFromCopy = dateFromCopy + timedelta(1)
             
